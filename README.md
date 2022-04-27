@@ -1,8 +1,14 @@
 # Blocktank Server
 
-Main Repo for handling selling lightning channels.
+Blocktank is an LSP that allows businesses, apps, or online platforms to integrate, automate, and monetize services from your Lightning node. This includes channel configuration, channel purchases, channel info and more.
 
 
+#### [Live Version](http://synonym.to/blocktank)
+#### [Public API](https://synonym.readme.io/reference/nodeinfo)
+
+
+## Development
+Blocktank is a fully open source and everyone is welcome to contribute. The Blocktank project gives you everything you need to become your own LSP.  
 ### ⚠️ **Warning** ⚠️
 **Run this program at your own risk.**
 
@@ -41,10 +47,6 @@ Run all microservice workers (including the dependent workers)
 ```
 pm2 run ecosystem.config.js
 ```
-
-## Public API:
-
-* [README.io](https://synonym.readme.io/reference/nodeinfo)
 
 
 

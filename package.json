@@ -1,13 +1,13 @@
 {
   "name": "blocktank-server",
   "version": "0.0.1",
-  "description": "",
+"description": "Blocktank is an LSP that allows businesses, apps, or online platforms to integrate, automate, and monetize services from your Lightning node. This includes channel configuration, channel purchases, channel info and more.",
   "scripts": {
     "start": "pm2 start ./ecosystem.config.js",
     "restart": "pm2 start ./ecosystem.config.js",
     "update:inventory": "node ./cli/update-inventory.js"
   },
-  "author": "r32a",
+  "author": "r32a_",
   "license": "ISC",
   "dependencies": {
     "async": "^3.2.0",
