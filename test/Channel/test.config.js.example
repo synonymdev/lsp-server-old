@@ -1,0 +1,31 @@
+const config = {
+  api_host: 'http://localhost:4000//'
+}
+
+const btcConfig = {
+  bitcoin_node: {
+    username: 'polaruser',
+    password: 'polarpass',
+    url: 'http://127.0.0.1:18444'
+  },
+  db_url: 'mongodb://localhost:27017'
+}
+
+const lnConfig = {
+  ln_nodes: [{
+    cert: 'tls.cert',
+    macaroon: '.macaroon',
+    socket: '127.0.0.1:10003',
+    node_type: 'LND',
+    node_name: 'lnd'
+  }],
+  events: {
+    htlc_forward_event: [],
+    channel_acceptor: [],
+    peer_events: []
+  }
+}
+
+module.exports = {
+  config, btcConfig, lnConfig
+}
