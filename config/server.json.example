@@ -1,0 +1,44 @@
+{
+  "db_url":"mongodb://localhost:27017",
+  "ln_nodes": [
+    {
+      "cert": "/tls.cert",
+      "macaroon": "admin.macaroon",
+      "socket": "127.0.0.1:10007",
+      "node_type": "LND",
+      "node_name": "lnd"
+    }
+  ],
+  "bitcoin_node":{
+    "username":"polaruser",
+    "password":"polarpass",
+    "url":"http://127.0.0.1:18443"
+  },
+  "constants":{
+    "min_wallet_balance_buffer":1000,
+    "order_expiry" : 900000,
+    "max_attempt_channel_open" : 50,
+    "product_id": "625cea4d2c2de64cb734a0d7",
+    "min_chan_expiry": 1,
+    "max_chan_expiry": 12,
+    "min_channel_size": 1000000,
+    "max_channel_size": 200000000,
+    "channel_size_buffer_sats": 100000,
+    "max_channel_dollar": 9999,
+    "min_confirmation": 1,
+    "block_time": 1000,
+    "compliance_check": true
+  },
+  "zero_conf": {
+    "max_amount": 1000000000000,
+    "max_orders": 10,
+    "max_total_amount": 500000000,
+    "quote_expiry": 1000,
+    "mempool_timer": 5000
+  },
+  "public_uri": "http://localhost:4000",
+  "node_whitelist": [],
+  "ip_block_countries":[]
+}
+
+

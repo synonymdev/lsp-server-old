@@ -1,0 +1,18 @@
+[
+{
+  "type": "add_item",
+  "data" : {
+    "name" : "Channel Liquidity",
+    "description" : "Channe liquidity",
+    "product_type" : "LN_CHANNEL",
+    "product_meta":{},
+    "stats":{
+      "sold_count" : 0,
+      "on_hold": 0,
+      "available" : 100,
+      "total":100
+    },
+    "state" : 1
+  }
+}
+]

@@ -1,0 +1,311 @@
+swagger: "2.0"
+info:
+  description: "Blocktank is a Lightning Network service provider (LSP)"
+  version: "1.0.0"
+  title: "Blocktank"
+  # termsOfService: ""
+  # contact:
+    # email: ""
+host: "blocktank.synonym.to"
+basePath: "/api/v1"
+tags:
+- name: "Channels"
+  description: "All endpoints related to buying lightning channels"
+- name: LNURL
+  description: "LNURL endpoitns"
+schemes:
+- "https"
+x-readme:
+  explorer-enabled: true
+  samples-enabled: true
+  samples-languages:
+    - curl
+paths:
+  /node/info:
+    get:
+      tags:
+      - "Channels"
+      summary: "Service Info"
+      description: "Returns information about Blocktank Lightning node and services on offer."
+      operationId: "nodeInfo"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "Node and service info"
+  /channel/buy:
+    post:
+      tags:
+      - "Channels"
+      summary: "Request a channel to purchase."
+      description: "Request a channel to purchase."
+      operationId: "buyChannel"
+      produces:
+      - "application/json"
+      parameters:
+        - in: body
+          name: Channel request
+          description: Channel to purchase.
+          schema:
+            type: object
+            required:
+              - product_id
+              - remote_balance
+              - local_balance
+              - channel_expiry
+            properties:
+              product_id:
+                type: string
+              remote_balance:
+                type: number
+                default: 1000000
+              local_balance:
+                type: number
+                default: 2000000
+              channel_expiry:
+                type: number
+                default: 1
+      responses:
+        "200":
+          description: "Channel quote"
+          schema:
+              $ref: "#/definitions/ChannelQuote"
+  /channel/manual_finalise:
+    post:
+      tags:
+      - "Channels"
+      summary: "Finalise a purchased channel"
+      description: "Set the node that Blocktank will open a channel to after paying for your channel."
+      operationId: "finaliseChannel"
+      produces:
+      - "application/json"
+      parameters:
+        - in: body
+          name: Channel request
+          description: Channel to purchase.
+          schema:
+            type: object
+            required:
+              - product_id
+              - order_id
+              - node_uri
+              - private
+            properties:
+              product_id:
+                type: string
+              order_id:
+                type: string
+              node_uri:
+                type: string
+              private:
+                type: boolean
+      responses:
+        "200":
+          description: "Channel claimed"
+  /channel/order:
+    get:
+      tags:
+      - "Channels"
+      summary: "Get an order"
+      description: "Get all information regarding a channel order"
+      operationId: "getOrder"
+      produces:
+      - "application/json"
+      parameters:
+        - in: query
+          type: string
+          name: order_id
+          description: Order id.
+      responses:
+        "200":
+          description: "Channel quote"
+          schema:
+              $ref: "#/definitions/ChannelOrder"
+  /lnurl/channel:
+    get:
+      tags:
+        - LNURL
+      summary: "LN URL connect to node"
+      description: "LNURL Connect"
+      operationId: "lnurlConnect"
+      produces:
+      - "application/json"
+      parameters:
+        - in: query
+          type: string
+          name: order_id
+          description: Required for LNURL connect
+        - in: query
+          type: string
+          name: k1
+          description: Required for LNURL callback
+        - in: query
+          type: string
+          name: remote_id
+          description: Required for LNURL callback. Remote node address of form node_key@ip_address:port_number. IP address and port number is optional
+      responses:
+        "200":
+          description: "LNURL connect "
+          schema:
+            $ref: "#/definitions/LNURLConnect"
+definitions:
+  LNURLConnect:
+    type: object
+    properties:
+      k1:
+        type: string
+        description: order id
+      tag:
+        type: string
+        default: channelRequest
+      callback:
+        type: string
+        description: A second-level URL which would initiate an OpenChannel message from target LN node
+      uri:
+        type: string
+        description: Blocktank node info
+      status:
+        type: string
+        description: Response status
+        enum: ["OK", "ERROR"]
+      reason:
+        type: string
+        description: Error reason
+      
+  ChannelQuote:
+    type: "object"
+    properties:
+      order_id:
+        type: string
+      ln_invoice:
+        type: string
+      total_amount:
+        type: integer
+      btc_address:
+        type: string
+      lnurl_channel:
+        type: string
+  ChannelOrder:
+    type: "object"
+    properties:
+      _id:
+        description: Order id
+        type: string
+      local_balance:
+        type: integer
+      remote_balance:
+        type: integer
+      channel_expiry:
+        type: integer
+        description: Channel expiry is in weeks. 
+      channel_expiry_ts:
+        type: integer
+        description: Blocktank has the righ to close the channel after this time
+      order_expiry:
+        type: integer
+        description: order is valid until this time
+      total_amount:
+        type: integer
+        description: total amount payable by customer
+      btc_address:
+        type: string
+        description: Destination address for on chain payments
+      created_at:
+        type: integer
+        description: Time that the order was created
+      amount_received:
+        type: number
+        description: how much satoshi orders has recieved
+      remote_node:
+        type: object
+        properties:
+          err:
+            type: boolean
+          port:
+            type: number
+          ip:
+            type: string
+          addr:
+            type: string
+          public_key:
+            type: string
+      channel_open_tx:
+        type: object
+        properties:
+          transaction_id:
+            type: string
+          transaction_vout: 
+            type: string
+      purchase_invoice:
+        type: string
+      lnurl:
+        type: object
+        description: LNUrl channel object
+        properties:
+          uri: 
+            type: string
+          callback:
+            type: string
+          k1:
+            type: string
+          tag: 
+            default: "channelRequest"
+      state:
+        $ref: "#/definitions/OrderStates"
+      onchain_payments:
+        type: array
+        items:
+          type: object
+          properties:
+            height: 
+              type: integer
+            hash:
+              type: string
+            to:
+              type: string
+            amount_base:
+              type: integer
+            zero_conf:
+              type: boolean
+              description: if payment was accepted as zero conf
+      
+    xml:
+      name: "Category"
+  OrderStates:
+    type: "object"
+    description: Order state can be one of the following
+    properties:
+      CREATED:
+        type: number
+        description: Order has been created
+        default: 0
+      PAID:
+        type: number
+        description: Order has been paid
+        default: 100
+      URI_SET:
+        type: number
+        description: Order has been paid and node uri is set
+        default: 200
+      OPENING:
+        type: number
+        description: Lightning channel is opening
+        default: 300
+      CLOSING:
+        type: number
+        description: Lightning channel is closing
+        default: 350
+      GIVE_UP:
+        type: number
+        description: Gave up opening channel
+        default: 400
+      CLOSED:
+        type: number
+        description: Lightning channel has been closed
+        default: 450
+      OPEN:
+        type: number
+        description: Lightning channel is open
+        default: 500
