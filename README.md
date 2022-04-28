@@ -8,7 +8,7 @@ Blocktank is an LSP that allows businesses, apps, or online platforms to integra
 
 
 ## Development
-Blocktank is a fully open source and everyone is welcome to contribute. The Blocktank project gives you everything you need to become your own LSP.  
+Blocktank is a fully open source and everyone is welcome to contribute. The Blocktank project gives you everything you need to become your own LSP.
 ### ⚠️ **Warning** ⚠️
 **Run this program at your own risk.**
 
@@ -31,7 +31,7 @@ grape --dp 20002 --aph 40001 --bn '127.0.0.1:20001
 Create the settings files located in `./config`
 ```
 cp ./config/server.json.example ./config/server.json
-cp ./config/auth.json ./config/auth.json
+cp ./config/auth.json.example ./config/auth.json
 ```
 
 Create Inventory item
@@ -40,12 +40,18 @@ cd ./cli
 node update-inventory
 ```
 
-Add the new inventory id to ` ./config/server.json` under `product_id`
+Add the new inventory id to ` ./config/server.json` under `product_id`. Blocktank creates a new DB in MongoDB called Lighthouse. Looking in the `Inventory` collection to find your new product id...
+
+```
+mongosh
+  use Lighthouse
+  db.Inventory.find({})
+```
 
 Run all microservice workers (including the dependent workers)
 
 ```
-pm2 run ecosystem.config.js
+pm2 start ecosystem.config.js
 ```
 
 
@@ -53,11 +59,11 @@ pm2 run ecosystem.config.js
 ## Architecture
 
 ### Microservices
-* Blocktank Server is a series of small scripts communicating with each other via [Grenache](https://blog.bitfinex.com/tutorial/bitfinex-loves-microservices-grenache/) - [Github](https://github.com/bitfinexcom/grenache). 
+* Blocktank Server is a series of small scripts communicating with each other via [Grenache](https://blog.bitfinex.com/tutorial/bitfinex-loves-microservices-grenache/) - [Github](https://github.com/bitfinexcom/grenache).
 
 ### Workers in this repo
 
-* LN-Channel-Opener: 
+* LN-Channel-Opener:
   * Fetches orders that have been paid and claimed, then opens the channel.
 * LN-Channel-Watch
   * Watch channels that are opened and update an order's channel.
@@ -87,10 +93,10 @@ pm2 run ecosystem.config.js
   * Handle admin endpoints
 * Exchange Rate
   * Handle currency conversions api endpoint.
-  
+
 ### Dependent Repos:
   * Blocktank-worker-ln
-    * Worker for interacting with Lightning Network Node 
+    * Worker for interacting with Lightning Network Node
   * Blocktank-worker-btc
     * Worker for interacting with Bitcoin node
   * Blocktank-worker-router
@@ -106,7 +112,7 @@ pm2 run ecosystem.config.js
 ### Worker to Worker calls
 1. Looking at Controller class in `util/Worker.js` you can see some pre written helper functions for calling popular workers like The bitcoin worker or the LN worker. Most microservice workers extend from the Controller class.
 2. Every worker is running a Grenache server and a client
-3. Grenache server is listening to calls from other workers. 
+3. Grenache server is listening to calls from other workers.
 4. Grenache client is used to call other workers.
 
 ## Admin API:
@@ -129,15 +135,15 @@ Credit a channel manually, if it hasn't been picked up automatically.
 
 ### `GET: /v1/channel/orders`
 
-Credit a channel manually, if it hasn't been picked up automatically.
+Get a list of orders
 
 **Parameters:**
 ```
 {
-  "state" : 100 // Get orders in a state
-  "expired_channels": true // Get all channels that can be closed
-  "order_id": "6147e8ca19d94f8a1226a212" // Get a single order
-  "page": 1 // Pagination
+  "state" : 100, // Get orders in a state
+  "expired_channels": true, // Get all channels that can be closed
+  "order_id": "6147e8ca19d94f8a1226a212", // Get a single order
+  "page": 1, // Pagination
 }
 ```
 
@@ -150,7 +156,7 @@ Begin channel closing process.
 **Parameters:**
 ```
 {
-  "order_id":"ALL || order ir" // pass ALL to close all expired channels, pass order id to close a channel
+  "order_id":"ALL || order id" // pass ALL to close all expired channels, pass order id to close a channel
 }
 ```
 
@@ -162,8 +168,8 @@ Save refund info and change order state to REFUNDED.
 **Parameters:**
 ```
 {
-  "order_id": // Order id
-  "refund_tx": // Transaction id or invoice 
+  "order_id": "xxx", // Order id
+  "refund_tx": "xxx", // Transaction id or invoice
 }
 ```
 
