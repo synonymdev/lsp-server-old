@@ -1,19 +1,5 @@
 {
   "db_url":"mongodb://localhost:27017",
-  "ln_nodes": [
-    {
-      "cert": "/tls.cert",
-      "macaroon": "admin.macaroon",
-      "socket": "127.0.0.1:10007",
-      "node_type": "LND",
-      "node_name": "lnd"
-    }
-  ],
-  "bitcoin_node":{
-    "username":"polaruser",
-    "password":"polarpass",
-    "url":"http://127.0.0.1:18443"
-  },
   "constants":{
     "min_wallet_balance_buffer":1000,
     "order_expiry" : 900000,
@@ -27,7 +13,7 @@
     "max_channel_dollar": 9999,
     "min_confirmation": 1,
     "block_time": 1000,
-    "compliance_check": true
+    "compliance_check": false
   },
   "zero_conf": {
     "max_amount": 1000000000000,
