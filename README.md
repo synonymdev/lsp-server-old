@@ -18,7 +18,7 @@ Blocktank is a fully open source and everyone is welcome to contribute. The Bloc
 * Mongodb
 * LND
 * Node.js >v12
-* PM2
+* [PM2](https://pm2.keymetrics.io/)
 * [Grenache Grape](https://github.com/bitfinexcom/grenache-grape)
 
 ## How to run:
@@ -28,19 +28,20 @@ Start 2 Grapes in the background for microservice communication:
 grape --dp 20001 --aph 30001 --bn '127.0.0.1:20002' &
 grape --dp 20002 --aph 40001 --bn '127.0.0.1:20001' &
 ```
-Create the settings files located in `./config`
+
+Copy and update the example settings files located in `./config`
 ```
 cp ./config/server.json.example ./config/server.json
 cp ./config/auth.json.example ./config/auth.json
 ```
 
-Create Inventory item
+Create Inventory item (this creates a product in the mongodb database)
 ```
 cd ./cli
 node update-inventory
 ```
 
-Add the new inventory id to ` ./config/server.json` under `product_id`. Blocktank creates a new DB in MongoDB called Lighthouse. Looking in the `Inventory` collection to find your new product id...
+Add the new inventory id to `./config/server.json` under `product_id`. Blocktank creates a new DB in MongoDB called Lighthouse. Looking in the `Inventory` collection to find your new product id...
 
 ```
 mongosh
@@ -54,6 +55,11 @@ Run all microservice workers (including the dependent workers)
 pm2 start ecosystem.config.js
 ```
 
+## See Also
+
+[Blocktank BTC Worker](https://github.com/synonymdev/blocktank-worker-btc) - a set of service workers that provide access to Bitcoin RPC endpoints, watch the mempool and alerts on new blocks
+
+[Blocktank LN Worker](https://github.com/synonymdev/blocktank-worker-ln) - service workers that provide access to Lightning Node features
 
 
 ## Architecture
