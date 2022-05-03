@@ -23,10 +23,10 @@ Blocktank is a fully open source and everyone is welcome to contribute. The Bloc
 
 ## How to run:
 
-Start 2 Grapes for microservice communication:
+Start 2 Grapes in the background for microservice communication:
 ```
-grape --dp 20001 --aph 30001 --bn '127.0.0.1:20002'
-grape --dp 20002 --aph 40001 --bn '127.0.0.1:20001
+grape --dp 20001 --aph 30001 --bn '127.0.0.1:20002' &
+grape --dp 20002 --aph 40001 --bn '127.0.0.1:20001' &
 ```
 Create the settings files located in `./config`
 ```
