@@ -82,7 +82,7 @@ function parseChannelOpenErr (err) {
   }
 
   if (err.message.includes('WalletNotFullySynced')) {
-    return ['NODE_NOT_SYNCED', true]
+    return ['NODE_NOT_SYNCED', false]
   }
   return ['SERVICE_FAILED_TO_OPEN_CHANNEL', false]
 }

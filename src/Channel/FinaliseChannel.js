@@ -16,7 +16,7 @@ class FinaliseChannel extends Worker {
   }
 
   async checkNodeCompliance (pubkey, socket, order, cb) {
-    if (!config.compliance_check) return cb(null, { aml_pass: true })
+    if (!config.constants.compliance_check) return cb(null, { aml_pass: true })
     this.gClient.send('svc:channel_aml', {
       method: 'amlFiatCapactyCheck',
       args: {
