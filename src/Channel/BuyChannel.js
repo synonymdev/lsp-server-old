@@ -136,7 +136,9 @@ class BuyChannel extends Worker {
           if (err) return next(err)
           const minBal = constants.min_wallet_balance_buffer + balance
           if (minBal <= totalCapacity) {
-            this.alertSlack('warning', 'Low onchain bitcoin balance.')
+            const errStr = 'Low onchain bitcoin balance.'
+            console.log(errStr)
+            this.alertSlack('warning', errStr)
             return next(true, this.errRes('Service is not available at this time.'))
           }
           next(null, null)
