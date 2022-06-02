@@ -76,6 +76,7 @@ class GetOrder extends Worker {
 
   async main (args, options, cb) {
     const orderId = args.order_id
+    if(!orderId) return this.errRes("Order id not passed")
     const nodeInfo = await this.callLn('getInfo', {})
     Order.findOne({ _id: orderId }, async (err, data) => {
       if (err || !data) {

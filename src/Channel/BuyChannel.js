@@ -71,7 +71,7 @@ class BuyChannel extends Worker {
     }
 
     // Local balance must always be bigger than remote balance
-    if (remoteBalance > localBalance) {
+    if (localBalance <= remoteBalance) {
       return 'Local balance must be bigger than remote balance'
     }
 

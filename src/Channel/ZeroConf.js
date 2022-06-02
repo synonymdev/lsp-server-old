@@ -71,7 +71,8 @@ async function main () {
   }
 
   function checkPayment (payments) {
-    // Payment must be less than maximum amount
+
+    // Payment must be less than maximum amount    
     const isValidPayment = payments.filter((p) => p.amount_base >= zcConfig.max_amount)
     if (isValidPayment.length !== 0) {
       return 'PAYMENT_TOO_LARGE'
@@ -112,6 +113,8 @@ async function main () {
     return async.map(orders, async (order) => {
       let totalAmount = null
       // Find transactions that belong to this order
+      if(order.onchain_payments.length !== 0) return null
+       
       const payments = _.filter(mempoolTx, { to: order.btc_address })
       if (payments.length === 0) return null
 

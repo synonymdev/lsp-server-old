@@ -3,6 +3,7 @@ const { default: axios } = require('axios')
 const BN = require('bignumber.js')
 const { get } = require('lodash')
 const config = require('../../config/server.json')
+const { toBtc, toSatoshi } = require('./sats-convert')
 
 async function getFRR () {
   try {
@@ -18,28 +19,39 @@ async function getFRR () {
 const DUST_LIMIT = BN(546)
 const MIN_PRICE = DUST_LIMIT.times(2)
 
-async function getChannelFee ({ channel_expiry: expiry, local_balance: localBalance, remote_balance: remoteBalance }) {
+async function getChannelFee ({ channel_expiry: expiry, local_balance: localBalance }) {
+
   if (config.constants.free_channels) return 0
+  
+  const amount = toBtc(localBalance)
   const _FRR = await getFRR()
   if (!_FRR) return null
-  // Rate per hour
   const FRR = BN(_FRR)
-  // Convert channel duration to hours
-  const durationWeek = BN(expiry).times(168)
   // Price = Loan amount x Rate X Duration
-  const price = BN(localBalance).times(FRR).times(durationWeek)
-
+  // Using: https://support.bitfinex.com/hc/en-us/articles/115004554309-Margin-Funding-interest-on-Bitfinex
+  const t = BN(expiry).times(604800)
+  const price = BN(amount).times((FRR)*(t/86400))
+  // const price = BN(amount).times(FRR).times(12)
   if (price.isNaN() || price.lte(0)) {
     throw new Error('Failed to create channel fee')
   }
-
-  if (price.lte(MIN_PRICE)) {
+  const priceSats = BN(toSatoshi(price))
+  if (priceSats.lte(MIN_PRICE)) {
     return MIN_PRICE.toString()
   }
 
-  return price.toFixed(0)
+  return priceSats.toFixed(0)
 }
 
+/**
+ * @desc Calculate price of a channel
+ * @param {Object} args
+ * @param {Number} args.channel_expiry Channel expiry in weeks
+ * @param {Number} args.local_balance The balance on Blokctank's side in SATOSHI
+ * @param {Number} args.remote_balance The balance on custuomer's side in SATOSHI
+ * @returns {Number} price in satoshi.
+ * @returns {Number} totalAmount in satoshi. The amount the customer must payu
+ */
 async function getChannelPrice (args) {
   const price = await getChannelFee(args)
   if (!price) throw new Error('Failed to get price')
@@ -53,5 +65,6 @@ async function getChannelPrice (args) {
 
 module.exports = {
   getChannelFee,
-  getChannelPrice
+  getChannelPrice, 
+  MIN_PRICE
 }

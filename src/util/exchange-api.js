@@ -1,10 +1,9 @@
 'use strict'
 const { default: axios } = require('axios')
-const { toBtc, SATOSHI } = require('./sats-convert')
-const { get } = require('lodash')
 const { default: BigNumber } = require('bignumber.js')
+const { toBtc,SATOSHI } = require('./sats-convert')
 
-async function callAPI (ticker) {
+async function callTicker (ticker) {
   try {
     const res = await axios.get('https://api-pub.bitfinex.com/v2/tickers?symbols=' + ticker)
     return res
@@ -14,12 +13,26 @@ async function callAPI (ticker) {
     return null
   }
 }
+async function callCandles (ticker) {
+  try {
+    const res = await axios.get('https://api-pub.bitfinex.com/v2/candles/trade' + ticker)
+    return res.data
+  } catch (err) {
+    console.log('Failed to get FRR')
+    console.log(err)
+    return null
+  }
+}
+
 
 async function getRate (ticker) {
-  const data = await callAPI(ticker)
-  const res = get(data, 'data[0]')
+  const data = await callTicker(ticker)
+  let res
+  if (data.data && data.data[0]) {
+    res = data.data[0]
+  }
   return {
-    price: res ? res[7] : null
+    price: res[7] || null
   }
 }
 
@@ -28,7 +41,7 @@ const ExchangeRate = {
     if (sats === 0) return 0
     const btcUSD = await ExchangeRate.getBtcUsd()
     const btc = toBtc(sats)
-    return BigNumber(btc).times(btcUSD.price).dp(3, BigNumber.ROUND_FLOOR).toString()
+    return BigNumber(btc).times(btcUSD.price).toNumber()
   },
 
   usdToBtc: async (dollar) => {
@@ -47,8 +60,15 @@ const ExchangeRate = {
   },
 
   async getRatesRaw (tickers) {
-    const res = await callAPI(tickers)
+    const res = await callTicker(tickers)
     return res.data
+  },
+
+  historicalBtcUsd: async (date) =>{
+    const res = await callCandles(`:1D:tBTCUSD/last?start=${date}`)
+    return {
+      price: res? res[2] : null
+    }
   }
 }
 module.exports = ExchangeRate

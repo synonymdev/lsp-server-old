@@ -12,11 +12,20 @@ class ExchangeRate extends Worker {
 
   async getBtcUsd (args, cb) {
     let usd
-    try {
-      usd = await exchangeAPI.getBtcUsd()
-    } catch (err) {
-      console.log(err)
-      return cb(new Error('Failed to convert sats to usd'))
+    if(args && args.ts){
+      try {
+        usd = await exchangeAPI.historicalBtcUsd(args.ts)
+      } catch (err) {
+        console.log(err)
+        return cb(new Error('Failed to convert get btc usd historical price'))
+      }
+    } else {
+      try {
+        usd = await exchangeAPI.getBtcUsd()
+      } catch (err) {
+        console.log(err)
+        return cb(new Error('Failed to get btc usd price'))
+      }
     }
     cb(null, usd)
   }

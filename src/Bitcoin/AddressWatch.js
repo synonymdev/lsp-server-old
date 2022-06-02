@@ -85,7 +85,7 @@ class BtcAddressWatch extends Worker {
 }
 
 function getOrders (args = {}) {
-  return api.callWorker('svc:get_order', 'getPendingPaymentOrders', {})
+  return api.callWorker('svc:get_order', 'getPendingPaymentOrders', args || {})
 }
 
 function updateOrder (args) {
@@ -98,11 +98,17 @@ function confirmOrder (config, order, cb) {
   let totalConfirmed = new Bignumber(0)
 
   async.mapSeries(order.onchain_payments, async (p) => {
-    await api.callBlocks('getTransaction', p.hash)
-    if (currentHeight === 'SKIP' || currentHeight >= (p.height + constants.min_confirmation)) {
+    const btx = await api.callBlocks('getTransaction', p.hash)
+
+    if(!btx || !btx.blockheight) return p
+    
+    if (currentHeight === 'SKIP' || btx.confirmations >= constants.min_confirmation) {
       totalConfirmed = totalConfirmed.plus(p.amount_base)
       p.confirmed = true
     }
+
+    p.height = btx.blockheight
+    
     return p
   }, async (err, payments) => {
     if (err) {

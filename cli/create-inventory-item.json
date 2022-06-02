@@ -1,18 +1,25 @@
 [
-{
-  "type": "add_item",
-  "data" : {
-    "name" : "Channel Liquidity",
-    "description" : "Channe liquidity",
-    "product_type" : "LN_CHANNEL",
-    "product_meta":{},
-    "stats":{
-      "sold_count" : 0,
-      "on_hold": 0,
-      "available" : 100,
-      "total":100
-    },
-    "state" : 1
+  {
+    "type": "add_item",
+    "data" : {
+      "name" : "test_channel",
+      "description" : "LN channels",
+      "product_type" : "LN_CHANNEL",
+      "product_meta":{
+        "max_capacity": 1000000,
+        "max_capacity_tick": 500000,
+        "start_ts": 1661298489691,
+        "ticks": 8.64e+7,
+        "chan_size": 100000
+      },
+      "stats":{
+        "sold_count_tick" : 0,
+        "capacity_sold_tick" : 0,
+        "capacity_available_tick" : 500000,
+        "capacity_total":0,
+        "capacity_tick":0
+      },
+      "state" : 1
+    }
   }
-}
-]
+  ]
