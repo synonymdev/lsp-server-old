@@ -6,6 +6,7 @@ const async = require('async')
 const { Client: GrenacheClient } = require('blocktank-worker')
 const { lnWorker } = require('./src/util/common-workers')
 const { find } = require('lodash')
+const {parseChannelOpenErr, chanErrors: errors} = require("./src/util/channel-opening-errors")
 
 console.log('Starting Channel Opener...')
 
@@ -57,6 +58,7 @@ async function updateOrders (orders) {
     if (result.error) {
       console.log('Failing to open channel: ', order._id)
     }
+
     await Order.updateOrder(order._id, {
       state,
       order_result: order.order_result,
@@ -65,37 +67,19 @@ async function updateOrders (orders) {
   }))
 }
 
-function parseChannelOpenErr (err) {
-  if (err.message.includes('PeerIsNotOnline')) return ['PEER_NOT_REACHABLE', false]
-  if (err.message.includes('PeerPendingChannelsExceedMaximumAllowable')) return ['PEER_TOO_MANY_PENDING_CHANNELS', false]
-  if (err.message.includes('FailedToOpenChannel')) {
-    const errMsg = err.message
-    if (errMsg.includes('exceeds maximum chan size')) {
-      return ['CHAN_SIZE_TOO_BIG', true]
-    }
-    if (errMsg.includes('below min chan size')) {
-      return ['CHAN_SIZE_TOO_SMALL', true]
-    }
-  }
-  if (err.message.includes('InsufficientFundsToCreateChannel')) {
-    return ['WALLET_EMPTY', true]
-  }
-
-  if (err.message.includes('WalletNotFullySynced')) {
-    return ['NODE_NOT_SYNCED', false]
-  }
-  return ['SERVICE_FAILED_TO_OPEN_CHANNEL', false]
-}
-
 function parseChannelOptions (product, order) {
   if (product.product_type === 'LN_CHANNEL') {
-    let localBal = order.local_balance
     if (order.remote_balance > order.local_balance) {
-      localBal = order.remote_balance
+      return false
     }
+
+    if(order.remote_balance >= order.local_balance){
+      return false
+    }
+
     return {
       remote_amt: order.remote_balance,
-      local_amt: localBal
+      local_amt: order.local_balance
     }
   }
   return false
@@ -127,31 +111,28 @@ function channelOpener () {
       return cb(new Error('Throttled channel opening'))
     }
     count++
-    console.log(`Opening LN Channel to: ${order.remote_node.public_key}`)
     const res = { order }
     const op = parseChannelOptions(product, order)
     if (!op) return cb(new Error('invalid order options'))
-    lnWorker('openChannel', {
+    const chanOpenConfig = {
       ...op,
       remote_pub_key: order.remote_node.public_key,
       is_private: order.private_channel
-    }, (err, data) => {
+    }
+    console.log(`Opening LN Channel to: ${chanOpenConfig}`)
+
+    lnWorker('openChannel', chanOpenConfig, (err, data) => {
       if (err) {
-        const [errStr, giveup] = parseChannelOpenErr(err)
-        res.result = {
-          error: errStr, channel_error: err.message || err, giveup
-        }
-        console.log('Failed to open channel', order._id)
-        console.log(err)
+        const chanErr = parseChannelOpenErr(err, {
+          remote_node : order.remote_node
+        })
+        res.result = chanErr.toString()
+        console.log('Failed to open channel', order._id, chanErr.toString())
         return cb(null, res)
       }
       if (!data.transaction_id) {
         console.log('Failed to open channel, no txid:', order._id)
-        res.result = {
-          error: 'FAILED_OPENING',
-          giveup: true,
-          channel_error: JSON.stringify(err)
-        }
+        res.result = chanErrors.NO_TX_ID([err,data])
         return cb(null, res)
       }
       res.result = { channel_tx: data }

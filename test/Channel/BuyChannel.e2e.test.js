@@ -92,17 +92,21 @@ function validateFinalisedChannel (claim, paidOrder) {
   assert(claim.node_uri === nodeInfo.pubkey)
 }
 
-async function testOnChain (testConf) {
-  const { orderParams, order } = await createOrder()
-
-  console.log('Paying order via on on chain...')
-  await sleep(2000)
-  const pay = await btc.sendToAddr({
+function payOnChain(order, testConf){
+  return btc.sendToAddr({
     address: order.btc_address,
     tag: 'End to end testing',
     amount: Converter.toBtc(order.total_amount),
     replaceable: !testConf.zero_conf
   })
+}
+
+async function testOnChain (testConf) {
+  const { orderParams, order } = await createOrder()
+
+  console.log('Paying order via on on chain...')
+  await sleep(2000)
+  const pay = await payOnChain(order, testConf)
   console.log('Payed order: ', pay.txid)
 
   if (!testConf.zero_conf) {
@@ -154,13 +158,28 @@ async function testOnChain (testConf) {
       continue
     }
 
+
+
     if (orderClaimed && paidOrder.state === 500) {
       console.log('Order status: Channel is now open')
+      checkOnChainPayConfirmation(paidOrder,orderParams, testConf.zero_conf)
       channelOpen = true
       break
     }
   }
   if (!orderClaimed || !channelOpen) throw new Error('Order failed to be claimed or channel did not open')
+}
+
+function checkOnChainPayConfirmation(paidOrder, orderParams, isZeroConf){
+  const onchain = paidOrder.onchain_payments.forEach((p)=>{
+      if(p.total_amount !== paidOrder.amount_base) throw new Error("payment amounts dont match")
+      if(isZeroConf && p.height) throw new Error("height must be null for zero conf")
+      if(!isZeroConf && !p.height) throw new Error("height must be set for non zero conf")
+      if(!p.hash) throw new Error("payment hash not set")
+      if(isZeroConf && !p.zero_conf)  throw new Error("Zero conf not set")
+      if(p.from.length === 0) throw new Error("Sender address not set")
+      if(p.fee_base <= 0) throw new Error("Fee is invalid")
+  })
 }
 
 describe('End to end test', async function () {
@@ -172,6 +191,20 @@ describe('End to end test', async function () {
         setupBtc(done)
       })
     })
+  })
+
+  describe('on chain payments', async function () {
+
+    it("On chain zero conf payment array", async function () {
+      this.timeout(10000)
+      const { orderParams, order } = await createOrder()
+      const testConf = {zero_conf: true}
+      await payOnChain(order, testConf)
+      await sleep(5000)
+      let paidOrder = await client.getOrder(order.order_id)
+      checkOnChainPayConfirmation(paidOrder,orderParams,testConf)
+    })
+
   })
 
   it('should create an order for a channel, pay via LN and claim channel', async function () {
@@ -199,7 +232,7 @@ describe('End to end test', async function () {
 
     console.log('Claimed order')
     console.log('Checking order status...')
-    await sleep(2000)
+    await sleep(5000)
     paidOrder = await client.getOrder(order.order_id)
     assert(paidOrder.state === 200)
     assert(paidOrder.remote_node.public_key === nodeInfo.pubkey)
