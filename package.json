@@ -1,7 +1,7 @@
 {
   "name": "blocktank-server",
   "version": "0.0.1",
-"description": "Blocktank is an LSP that allows businesses, apps, or online platforms to integrate, automate, and monetize services from your Lightning node. This includes channel configuration, channel purchases, channel info and more.",
+  "description": "Blocktank is an LSP that allows businesses, apps, or online platforms to integrate, automate, and monetize services from your Lightning node. This includes channel configuration, channel purchases, channel info and more.",
   "scripts": {
     "start": "pm2 start ./ecosystem.config.js",
     "restart": "pm2 start ./ecosystem.config.js",
@@ -30,6 +30,7 @@
     "@synonymdev/blocktank-client": "0.0.45",
     "blocktank-worker-btc": "git+https://github.com/synonymdev/blocktank-worker-btc.git",
     "blocktank-worker-ln": "git+https://github.com/synonymdev/blocktank-worker-ln.git",
-    "mocha": "^9.0.2"
+    "mocha": "^9.0.2",
+    "nock": "^13.2.8"
   }
 }
