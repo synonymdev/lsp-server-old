@@ -26,7 +26,8 @@ function update (item) {
 
 async function main () {
   console.log(`Running Inventory : ${data.length} Items \n\n\n`)
-  await Promise.all(data.map(update))
+  const res = await Promise.all(data.map(update))
+  console.log(res)
   console.log('Finished')
 }
 

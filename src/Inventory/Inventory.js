@@ -35,6 +35,9 @@ class Inventory extends EventEmitter {
   static find (query, cb) {
     const inv = new Inventory()
     inv.on('ready', () => {
+      if(query._id){
+        query._id = new inv.db.ObjectId(query._id)
+      }
       inv.db.Inventory.find(query).toArray(cb)
     })
   }
