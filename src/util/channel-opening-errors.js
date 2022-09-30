@@ -88,9 +88,11 @@ function parseChannelOpenErr (err) {
     return errors.BLOCKTANK_NOT_READY(err)
   }
 
-  if(msg.includes("RemoteNodeDoesNotSupportMultipleChannels")){
+  if(errMsg("RemoteNodeDoesNotSupportMultipleChannels")){
     return errors.PEER_REJECT_MULTI_CHAN(err)
   }
+  console.log("UNHANDLED_CHANNEL_OPEN_ERR")
+  console.log(err.message ? err.message : err)
 
   return errors.SERVICE_FAILED_TO_OPEN_CHANNEL(err)
 }
