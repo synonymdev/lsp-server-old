@@ -2,8 +2,8 @@
   {
     "type": "add_item",
     "data" : {
-      "name" : "lugano_channel",
-      "description" : "Free channel for lugano",
+      "name" : "test_channel",
+      "description" : "LN channels",
       "product_type" : "LN_CHANNEL",
       "product_meta":{
         "max_capacity": 1000000,
