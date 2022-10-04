@@ -27,10 +27,16 @@ async function setupBtc (cb) {
     if (!Number.isInteger(data)) throw new Error('Bitcoin worker not ready')
     btc.mineRegtestCoin = promisify(btc.mineRegtestCoin.bind(btc))
     btc.sendToAddr = promisify(btc.sendToAddr.bind(btc))
-    // const block = await btc.mineRegtestCoin({ blocks: 6 })
     // if (block.length !== 6) throw new Error('Blocks not mined')
     cb()
   })
+}
+
+async function quickMine(){
+  console.log("Mining blocks")
+  const block = await btc.mineRegtestCoin({ blocks: 3 })
+  await sleep(5000)
+  console.log("Finished mining")
 }
 
 function setupClientLib (cb) {
@@ -41,6 +47,7 @@ function setupClientLib (cb) {
     serviceInfo = res.services[0]
     cb()
   }).catch((err) => {
+    console.log(err)
     throw err
   })
 }
@@ -51,7 +58,7 @@ function setupLN (cb) {
   clientLN.start((err) => {
     if (err) throw err
     nodeInfo = clientLN.nodes[0].info
-    clientLN.pay = promisify(clientLN.pay.bind(clientLN))
+    clientLN.pay = promisify(clientLN.pay.bind(clientLN, clientLN.getNode()))
     cb()
   })
 }
@@ -184,7 +191,7 @@ function checkOnChainPayConfirmation(paidOrder, orderParams, isZeroConf){
 
 describe('End to end test', async function () {
   before(function (done) {
-    this.timeout(10000)
+    this.timeout(100000)
     console.log('Setting up libs')
     setupClientLib(() => {
       setupLN(() => {
@@ -208,18 +215,20 @@ describe('End to end test', async function () {
   })
 
   it('should create an order for a channel, pay via LN and claim channel', async function () {
+    await quickMine()
     const { orderParams, order } = await createOrder()
 
     console.log('Paying order via LN...')
     await sleep(2000)
-    const pay = await clientLN.pay({}, { invoice: order.ln_invoice })
+    const pay = await clientLN.pay({ invoice: order.ln_invoice })
     console.log('Paid order')
 
     console.log('Fetching order...')
-    await sleep(5000)
+    await sleep(10000)
     assert(pay.is_confirmed)
     let paidOrder = await client.getOrder(order.order_id)
     validatePaidOrder(paidOrder, orderParams)
+    assert(paidOrder.state === 100)
 
     console.log('Claiming order...')
     const claim = await client.finalizeChannel({
@@ -229,12 +238,11 @@ describe('End to end test', async function () {
     })
     validateFinalisedChannel(claim, paidOrder)
     assert(paidOrder.onchain_payments.length === 0)
-
     console.log('Claimed order')
     console.log('Checking order status...')
     await sleep(5000)
     paidOrder = await client.getOrder(order.order_id)
-    assert(paidOrder.state === 200)
+    assert(paidOrder.state === 300)
     assert(paidOrder.remote_node.public_key === nodeInfo.pubkey)
 
     let orderClaimed = false

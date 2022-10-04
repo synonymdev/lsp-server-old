@@ -119,20 +119,20 @@ function channelOpener () {
       remote_pub_key: order.remote_node.public_key,
       is_private: order.private_channel
     }
-    console.log(`Opening LN Channel to: ${chanOpenConfig}`)
+    console.log(`Opening LN Channel to: ${JSON.stringify(chanOpenConfig,null,2)}`)
 
     lnWorker('openChannel', chanOpenConfig, (err, data) => {
       if (err) {
         const chanErr = parseChannelOpenErr(err, {
           remote_node : order.remote_node
         })
-        res.result = chanErr.toString()
+        res.result = { error: chanErr.toString() }
         console.log('Failed to open channel', order._id, chanErr.toString())
         return cb(null, res)
       }
       if (!data.transaction_id) {
         console.log('Failed to open channel, no txid:', order._id)
-        res.result = chanErrors.NO_TX_ID([err,data])
+        res.result = { error : chanErrors.NO_TX_ID([err,data]) }
         return cb(null, res)
       }
       res.result = { channel_tx: data }
