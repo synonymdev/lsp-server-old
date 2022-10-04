@@ -29,8 +29,8 @@
   "devDependencies": {
     "@synonymdev/blocktank-client": "0.0.45",
     "blocktank-dev-net": "github:rbndg/blocktank-dev-net",
-    "blocktank-worker-btc": "git+https://github.com/synonymdev/blocktank-worker-btc.git",
-    "blocktank-worker-ln": "git+https://github.com/synonymdev/blocktank-worker-ln.git",
+    "blocktank-worker-btc": "git+https://github.com/rbndg/blocktank-worker-btc.git",
+    "blocktank-worker-ln": "git+https://github.com/rbndg/blocktank-worker-ln.git",
     "mocha": "^9.0.2",
     "nock": "^13.2.8"
   }
