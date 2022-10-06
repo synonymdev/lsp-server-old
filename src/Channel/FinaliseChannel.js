@@ -87,7 +87,11 @@ class FinaliseChannel extends Worker {
 
     order.remote_node = uri
     order.remote_node_src = !params.uri_src ? 'manual' : params.uri_src
-    order.private_channel = params.private
+    if(+params.private === 0){
+      params.private_channel = false
+    } else {
+      order.private_channel = params.private
+    }
     order.state = Order.ORDER_STATES.URI_SET
     Order.updateOrder(params.order_id, order, (err) => {
       if (err) {
