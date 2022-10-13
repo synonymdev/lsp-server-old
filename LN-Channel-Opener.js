@@ -114,8 +114,16 @@ function channelOpener () {
     const res = { order }
     const op = parseChannelOptions(product, order)
     if (!op) return cb(new Error('invalid order options'))
+
+    if(op.remote_amt){
+      op.give_tokens = op.remote_amt
+      if(op.give_tokens < 0) return cb(new Error('Invalid channel balance amounts'))
+      op.local_amt = op.local_amt + op.remote_amt
+    }
+
     const chanOpenConfig = {
-      ...op,
+      local_tokens:op.local_amt,
+      give_tokens: op.give_tokens,
       remote_pub_key: order.remote_node.public_key,
       is_private: order.private_channel
     }
