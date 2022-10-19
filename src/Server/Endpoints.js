@@ -44,6 +44,14 @@ class USER_ENDPOINTS {
       ],
       geoblocked: true
     },
+    '/channel/geocheck':{ 
+      description:`Check if geo blocked or not `,
+      name:"getNodeInfo",
+      method: "GET",
+      svc: "svc:buy_channel",
+      svc_fn : "extGeoCheck",
+      geoblocked: true
+    },
     '/channel/manual_finalise': {
       name: "set node uri of bought channel",
       description:`Set node uri to manually open channel.`,

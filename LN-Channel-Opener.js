@@ -122,8 +122,8 @@ function channelOpener () {
     }
 
     const chanOpenConfig = {
-      local_tokens:op.local_amt,
-      give_tokens: op.give_tokens,
+      local_amt:op.local_amt,
+      remote_amt: op.remote_amt,
       remote_pub_key: order.remote_node.public_key,
       is_private: order.private_channel
     }

@@ -27,7 +27,7 @@ async function getOrders () {
   const db = await Db()
   return db.LnChannelOrders.find({
     state: { $in: [ORDER_STATES.OPENING, ORDER_STATES.OPEN, ORDER_STATES.CLOSING] }
-  }).limit(100).toArray()
+  }).limit(5000).toArray()
 }
 
 const getOpenedChannels = promisify((cb) => {

@@ -23,6 +23,10 @@ class BuyChannel extends Worker {
     return Date.now() + constants.order_expiry
   }
 
+  async extGeoCheck (args, config, cb) {
+    cb(null,{ accept: true })
+  }
+
   async checkCapacityLimit (totalCapacity) {
     const btcusd = await getBtcUsd()
     const usd = new BN(btcusd.price).times(toBtc(totalCapacity))
