@@ -64,7 +64,7 @@ class GetOrder extends Worker {
     const query = {
       order_expiry: { $lte: Date.now() },
       state: ORDER_STATES.CREATED,
-      'onchain_payments.0': { $exists: true }
+      'onchain_payments.0': { $exists: false }
     }
     Order.updateOrders(query, {
       state: ORDER_STATES.EXPIRED
