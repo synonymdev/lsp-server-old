@@ -94,28 +94,37 @@ class Order extends EventEmitter {
 
   static find (query, cb) {
     const order = new Order()
-    let limit, sort, skip
-    if(query._limit){
-      limit = query._limit
-    }
-
-    if(query._sort){
-      sort = query._sort
-    }
-
-    if(query._skip && query._skip > 0 & query._skip <= 100){
-      skip = query._skip
-    }
-
-    if(query._id) {
-      query._id = new order.db.ObjectId(query._id)
-    }
-
-    delete query._sort
-    delete query._skip
-    delete query._limit
-
     order.on('ready', () => {
+      let limit, sort, skip
+      if(query._limit){
+        limit = query._limit
+      }
+
+      if(query._sort){
+        sort = query._sort
+      }
+
+      if(query._skip && query._skip > 0 & query._skip <= 100){
+        skip = query._skip
+      }
+
+      try{
+        if(query._id) {
+          if(Array.isArray(query._id)){
+            query._id =  { $in : query._id.map((id)=> new order.db.ObjectId(id)) }
+          } else {
+            query._id = new  order.db.ObjectId(query._id)
+          }
+        }
+      } catch(err){
+        console.log(err)
+        return cb(new Error("invalid order id"))
+      }
+
+      delete query._sort
+      delete query._skip
+      delete query._limit
+
 
       let dbCall = order.db.LnChannelOrders.find(query)
       

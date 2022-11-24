@@ -10,6 +10,8 @@ const { BigNumber } = require('bignumber.js')
 class NodeInfo extends Worker {
   constructor (config) {
     config.name = 'svc:node_info'
+    config.port = config.port || 7674
+
     super(config)
   }
 

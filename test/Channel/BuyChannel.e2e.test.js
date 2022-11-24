@@ -129,7 +129,7 @@ async function testOnChain (testConf) {
 
     if (x === 50) throw new Error('Zero conf not detected')
     if (paidOrder.state !== 100) {
-      console.log('Waiting..')
+      console.log('Waiting.. state: ', paidOrder.state)
       continue
     }
     validatePaidOrder(paidOrder, orderParams)
