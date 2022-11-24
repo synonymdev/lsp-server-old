@@ -62,9 +62,17 @@ class GetOrder extends Worker {
 
   markOrdersExpired (args, cb) {
     const query = {
-      order_expiry: { $lte: Date.now() },
-      state: ORDER_STATES.CREATED,
-      'onchain_payments.0': { $exists: false }
+      $or:[
+        {
+          order_expiry: { $lte: Date.now() },
+          state: ORDER_STATES.CREATED,
+          'onchain_payments.0': { $exists: false }
+        },
+        {
+          order_expiry: { $lte: Date.now() - 8.64e+7 },
+          state: ORDER_STATES.CREATED,
+        },
+      ]
     }
     Order.updateOrders(query, {
       state: ORDER_STATES.EXPIRED
@@ -74,61 +82,70 @@ class GetOrder extends Worker {
     })
   }
 
+  async _formatOrders(nodeInfo, data){
+    data.product_id = data.product_id._id
+    data.purchase_invoice = data.ln_invoice.request
+    if (data.state === ORDER_STATES.GIVE_UP) {
+      const res = data.order_result.pop()
+      data.channel_open_error = res.error
+    }
+
+    data.lnurl_decoded = {
+      uri: nodeInfo.uris.pop(),
+      k1: data._id,
+      tag: 'channelRequest'
+    }
+    data.lnurl_string = lnurl.encode(`${publicUri}/v1/lnurl/channel?order_id=` + data._id)
+    data.renewals = data.renewals.map((r) => {
+      r.ln_invoice = r.ln_invoice.request
+      return r
+    })
+    if (data.state === ORDER_STATES.CREATED && !data.zero_conf) {
+      data.zero_conf_satvbyte = false
+      try {
+        const zc = await this._getZeroConfQuote(data.total_amount)
+        if (zc.accepted) {
+          data.zero_conf_satvbyte = zc.minimum_satvbyte
+          data.zero_conf_satvbyte_expiry = zc.fee_expiry
+          Order.updateOrder(data._id, {
+            zero_conf_satvbyte_expiry: data.zero_conf_satvbyte_expiry,
+            zero_conf_satvbyte: data.zero_conf_satvbyte
+          })
+        }
+      } catch (err) {
+        console.log('Failed to get zero conf', err)
+      }
+    }
+
+    try {
+      data.current_channel_info = await this._getLnStats(data)
+    } catch (err) {
+      data.channel_info = null
+      console.log(err)
+    }
+
+    privateProps.forEach((k) => {
+      delete data[k]
+    })
+    return data
+  }
+
   async main (args, options, cb) {
     const orderId = args.order_id
     if(!orderId) return this.errRes("Order id not passed")
     const nodeInfo = await this.callLn('getInfo', {})
-    Order.findOne({ _id: orderId }, async (err, data) => {
-      if (err || !data) {
+    const orders = orderId.split(",")
+    if(orders.length >= 50) return this.errRes("too many orders passed. max 50 orders")
+    Order.find({ _id: orders }, async (err, data) => {
+      if (err || !data || data?.length === 0) {
         console.log(err, data)
         return cb(null, this.errRes('Order not found'))
       }
-      data.product_id = data.product_id._id
-      data.purchase_invoice = data.ln_invoice.request
-      if (data.state === ORDER_STATES.GIVE_UP) {
-        const res = data.order_result.pop()
-        data.channel_open_error = res.error
+      const formatted = await Promise.all(data.map((d)=> this._formatOrders(nodeInfo, d) ))
+      if(orders.length === 1){
+        return cb(null, formatted.pop())
       }
-
-      data.lnurl_decoded = {
-        uri: nodeInfo.uris.pop(),
-        k1: args.order_id,
-        tag: 'channelRequest'
-      }
-      data.lnurl_string = lnurl.encode(`${publicUri}/v1/lnurl/channel?order_id=` + orderId)
-      data.renewals = data.renewals.map((r) => {
-        r.ln_invoice = r.ln_invoice.request
-        return r
-      })
-      if (data.state === ORDER_STATES.CREATED && !data.zero_conf) {
-        data.zero_conf_satvbyte = false
-        try {
-          const zc = await this._getZeroConfQuote(data.total_amount)
-          if (zc.accepted) {
-            data.zero_conf_satvbyte = zc.minimum_satvbyte
-            data.zero_conf_satvbyte_expiry = zc.fee_expiry
-            Order.updateOrder(data._id, {
-              zero_conf_satvbyte_expiry: data.zero_conf_satvbyte_expiry,
-              zero_conf_satvbyte: data.zero_conf_satvbyte
-            })
-          }
-        } catch (err) {
-          console.log('Failed to get zero conf', err)
-        }
-      }
-
-      try {
-        data.current_channel_info = await this._getLnStats(data)
-      } catch (err) {
-        data.channel_info = null
-        console.log(err)
-      }
-
-      privateProps.forEach((k) => {
-        delete data[k]
-      })
-
-      cb(null, data)
+      cb(null, formatted)
     })
   }
 }

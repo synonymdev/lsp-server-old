@@ -20,6 +20,7 @@ class FinaliseChannel extends Worker {
     this.gClient.send('svc:channel_aml', {
       method: 'amlFiatCapactyCheck',
       args: {
+        action: "channel_selling_request",
         node_public_key: pubkey,
         node_socket: socket,
         order
