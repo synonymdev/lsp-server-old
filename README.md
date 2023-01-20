@@ -4,7 +4,7 @@ Blocktank is an LSP that allows businesses, apps, or online platforms to integra
 
 
 #### [Live Version](http://synonym.to/blocktank)
-#### [Public API](https://synonym.readme.io/reference/nodeinfo)
+#### [API Docs](https://synonym.readme.io/reference/nodeinfo)
 
 
 ## Development
