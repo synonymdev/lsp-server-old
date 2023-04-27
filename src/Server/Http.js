@@ -18,7 +18,8 @@ class Server extends EventEmitter {
     this.app = express()
     this.app.use(helmet())
     this.app.use(bodyParser.json())
-    this.port = config.port
+    this.port = config.port || 4000
+    this.host = config.host || "loclahost"
     this.gClient = new GrenacheClient(config)
   }
 
@@ -88,7 +89,7 @@ class Server extends EventEmitter {
       }
       next()
     })
-    this.app.listen(this.port, () => {
+    this.app.listen(this.port, this.host, () => {
       console.log(`Express is listening at http://localhost:${this.port}`)
     })
   }

@@ -2,6 +2,7 @@
 
 const Inventory = require('../src/Inventory/Inventory')
 const data = require('./create-inventory-item.json')
+const { ObjectId } = require("mongodb")
 
 function update (item) {
   return new Promise((resolve, reject) => {
@@ -13,6 +14,7 @@ function update (item) {
     if (item.type === 'add_item') {
       console.log('adding')
       console.log(item.data)
+      item.data._id = new ObjectId("625cea4d2c2de64cb734a0d7")
       return Inventory.addNewItem(item.data, handle)
     }
 
