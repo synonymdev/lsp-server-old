@@ -2,7 +2,7 @@
 const { Worker } = require('blocktank-worker')
 const { pick } = require('lodash')
 const async = require('async')
-const { constants } = require('../../config/server.json')
+const { constants, db_url } = require('../../config/server.json')
 const Order = require('../Orders/Order')
 const exchange = require('../util/exchange-api')
 const { BigNumber } = require('bignumber.js')
@@ -11,6 +11,7 @@ class NodeInfo extends Worker {
   constructor (config) {
     config.name = 'svc:node_info'
     config.port = config.port || 7674
+    config.db_url = db_url
 
     super(config)
   }

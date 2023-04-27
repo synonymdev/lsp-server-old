@@ -90,7 +90,7 @@ class Server extends EventEmitter {
       next()
     })
     this.app.listen(this.port, this.host, () => {
-      console.log(`Express is listening at http://localhost:${this.port}`)
+      console.log(`Express is listening at http://${this.host}:${this.port}`)
     })
   }
 }
