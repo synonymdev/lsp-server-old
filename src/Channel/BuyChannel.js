@@ -12,6 +12,7 @@ const config = require('../../config/server.json')
 const { constants } = config
 const { public_uri: publicUri } = config
 
+
 class BuyChannel extends Worker {
   constructor (config) {
     config.name = 'svc:buy_channel'
@@ -99,6 +100,7 @@ class BuyChannel extends Worker {
     const db = this.db
     let product
     try {
+
       product = await db.Inventory.findOne({
         _id: new db.ObjectId(order.product_id)
       })
@@ -106,7 +108,7 @@ class BuyChannel extends Worker {
       console.log(err)
       return cb(null, this.errRes('Failed to find product'))
     }
-
+    console.log('try to find product', order.product_id)
     if (!product) {
       return cb(null, this.errRes('Not in stock'))
     }
