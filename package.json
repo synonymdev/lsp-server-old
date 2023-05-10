@@ -6,7 +6,7 @@
     "start": "pm2 start ./ecosystem.config.js",
     "restart": "pm2 start ./ecosystem.config.js",
     "update:inventory": "node ./cli/update-inventory.js",
-    "build": "tsc"
+    "build": "rm -rf dist/ && tsc"
   },
   "author": "r32a_",
   "license": "ISC",

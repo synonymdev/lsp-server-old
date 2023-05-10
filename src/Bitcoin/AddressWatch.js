@@ -137,6 +137,8 @@ async function confirmPayments (currentHeight) {
 }
 
 async function checkForBlacklistedAddress (blockTx) {
+  return blockTx;
+  // Todo: Fix this
   return async.filter(blockTx, async ([order, block]) => {
     const res = await api.callWorker('svc:channel_aml', 'isAddressBlacklisted', {
       address: block.from

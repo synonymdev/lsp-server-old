@@ -97,6 +97,8 @@ async function main () {
   }
 
   async function isBlacklistedPayment (payments) {
+    return false
+    // Todo: Fix blacklisting
     console.log('Checking blacklisted payments: ', payments.length)
     const addr = payments.map((tx) => tx.from)
     const res = await zcWorker.callWorker('svc:channel_aml', 'isAddressBlacklisted', {

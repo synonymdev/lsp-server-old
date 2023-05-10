@@ -7,11 +7,20 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Launch Program",
+            "name": "Launch Server Express",
             "skipFiles": [
                 "<node_internals>/**"
             ],
             "program": "${workspaceFolder}/Start-Express.js"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "ZeroConf Watcher",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/src/Channel/ZeroConf.js"
         }
     ]
 }

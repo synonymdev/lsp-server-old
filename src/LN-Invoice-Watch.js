@@ -2,8 +2,8 @@
 'use strict'
 const async = require('async')
 const { get } = require('lodash')
-const { lnWorker } = require('./src/util/common-workers')
-const { ORDER_STATES } = require('./src/Orders/Order')
+const { lnWorker } = require('./util/common-workers')
+const { ORDER_STATES } = require('./Orders/Order')
 const { Client: GrenacheClient } = require('blocktank-worker')
 
 function getInvoice (order) {

@@ -243,8 +243,10 @@ it('should create an order for a channel, pay via LN and claim channel', async f
   console.log('Checking order status...')
   await sleep(5000)
   paidOrder = await client.getOrder(order.order_id)
-  assert(paidOrder.state === 300)
-  assert(paidOrder.remote_node.public_key === nodeInfo.pubkey)
+  expect(paidOrder.state).toEqual(300)
+  // assert(paidOrder.state === 300)
+  // assert(paidOrder.remote_node.public_key === nodeInfo.pubkey)
+  expect(paidOrder.remote_node.public_key).toEqual(nodeInfo.pubkey)
 
   let orderClaimed = false
   let channelOpen = false

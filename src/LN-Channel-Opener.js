@@ -1,7 +1,7 @@
 'use strict'
 const Db = require('./DB/DB')
 const Order = require('./Orders/Order')
-const config = require('./config/server.json')
+const config = require('../config/server.json')
 const async = require('async')
 const { Client: GrenacheClient } = require('blocktank-worker')
 const { lnWorker } = require('./util/common-workers')
