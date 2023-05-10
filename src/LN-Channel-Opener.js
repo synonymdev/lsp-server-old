@@ -1,12 +1,12 @@
 'use strict'
-const Db = require('./src/DB/DB')
-const Order = require('./src/Orders/Order')
+const Db = require('./DB/DB')
+const Order = require('./Orders/Order')
 const config = require('./config/server.json')
 const async = require('async')
 const { Client: GrenacheClient } = require('blocktank-worker')
-const { lnWorker } = require('./src/util/common-workers')
+const { lnWorker } = require('./util/common-workers')
 const { find } = require('lodash')
-const {parseChannelOpenErr, chanErrors: errors} = require("./src/util/channel-opening-errors")
+const {parseChannelOpenErr, chanErrors: errors} = require("./util/channel-opening-errors")
 
 console.log('Starting Channel Opener...')
 
