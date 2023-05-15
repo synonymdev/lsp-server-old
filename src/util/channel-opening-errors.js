@@ -55,17 +55,19 @@ class ChannelOpenError {
 
 
 function parseChannelOpenErr (err) {
-  
+
   const errMsg = (txt)=>{
     if(Array.isArray(txt)){
-      return txt.filter((txt)=>{
-        return err.message.includes(txt)
-      }).length > 0
+      const matches = txt.filter((element)=>{
+        return err.code === element || err.message.includes(element)
+      })
+      return matches.length > 0
+    } else {
+      return err.message.includes(txt)
     }
-    return err.message.includes(txt)
   }
 
-  if (errMsg(['RemotePeerDisconnected', 'PeerIsNotOnline', 'RemotePeerExited'])) {
+  if (errMsg(['RemotePeerDisconnected', 'PeerIsNotOnline', 'RemotePeerExited', 'UnexpectedErrorAddingPeer'])) {
     return errors.PEER_NOT_REACHABLE(err)
   }
   if (errMsg('PeerPendingChannelsExceedMaximumAllowable')) {

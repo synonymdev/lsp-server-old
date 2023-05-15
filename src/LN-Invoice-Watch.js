@@ -1,12 +1,10 @@
 
 'use strict'
 const async = require('async')
-const { get } = require('lodash')
-const { lnWorker } = require('./util/common-workers')
 const { ORDER_STATES } = require('./Orders/Order')
 const { Client: GrenacheClient } = require('blocktank-worker')
 const { LnWorkerApi, Ln2EventListener } = require('@blocktank/ln2-api');
-const { waitOnSigint } = require('blocktank-worker2')
+const { waitOnSigint } = require('@blocktank/worker2')
 
 // function getInvoice (order) {
 //   return order.state === ORDER_STATES.CREATED

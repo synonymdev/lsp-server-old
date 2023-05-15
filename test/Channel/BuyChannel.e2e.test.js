@@ -232,10 +232,11 @@ it('should create an order for a channel, pay via LN and claim channel', async f
   validatePaidOrder(paidOrder, orderParams)
   assert(paidOrder.state === 100)
 
+  const nodeUri = nodeInfo.uris[0]
   console.log('Claiming order...')
   const claim = await client.finalizeChannel({
     order_id: paidOrder._id,
-    node_uri: nodeInfo.uris[0],
+    node_uri: nodeUri,
     private: false
   })
   validateFinalisedChannel(claim, paidOrder)
