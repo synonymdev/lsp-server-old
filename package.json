@@ -11,6 +11,7 @@
   "author": "r32a_",
   "license": "ISC",
   "dependencies": {
+    "@blocktank/ln2-api": "github:synonymdev/blocktank-worker-ln2#api",
     "async": "^3.2.0",
     "axios": "^0.21.4",
     "bcrypt": "^5.0.1",
@@ -31,13 +32,13 @@
   },
   "devDependencies": {
     "@synonymdev/blocktank-client": "0.0.45",
-    "blocktank-dev-net": "github:rbndg/blocktank-dev-net",
-    "blocktank-worker-btc": "git+https://github.com/rbndg/blocktank-worker-btc.git",
-    "blocktank-worker-ln": "git+https://github.com/rbndg/blocktank-worker-ln.git",
     "@types/jest": "^29.2.5",
+    "blocktank-dev-net": "github:rbndg/blocktank-dev-net",
+    "blocktank-worker-btc": "github:synonymdev/blocktank-worker-btc#master",
+    "blocktank-worker-ln": "github:synonymdev/blocktank-worker-ln#master",
     "jest": "^29.3.1",
-    "ts-jest": "^29.0.3",
     "nock": "^13.2.8",
+    "ts-jest": "^29.0.3",
     "ts-loader": "^9.4.2",
     "typescript": "^4.9.4"
   }

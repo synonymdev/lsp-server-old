@@ -78,6 +78,7 @@ async function createOrder() {
   assert(order.btc_address)
   assert(order.order_id)
   assert(order.ln_invoice)
+  console.log('invoice', order.ln_invoice)
   assert(Number.isInteger(order.total_amount))
   assert(Number.isInteger(order.price))
   assert(Number.isInteger(new Date(order.order_expiry).getTime()))

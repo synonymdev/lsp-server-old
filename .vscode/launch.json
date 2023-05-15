@@ -21,6 +21,24 @@
                 "<node_internals>/**"
             ],
             "program": "${workspaceFolder}/src/Channel/ZeroConf.js"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "LN-Invoice Watcher",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/src/LN-Invoice-Watch.js"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "GetOrder Worker",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/src/Channel/GetOrder.js"
         }
     ]
 }
