@@ -111,12 +111,12 @@ async function updateOrders (orders) {
  * @param {"open", "closed"} newState 
  */
 async function processChannelChanged(order) {
-  const orderedChannel = await LnWorkerApi.getOrderedChannel(order.channelOpen.id)
+  const orderedChannel = await LnWorkerApi.getOrderedChannel(order.channel_order.id)
   order.channelOpen = orderedChannel
   if (orderedChannel.state === 'open') {
-    console.log(`Order: ${order._id} : Channel Opened: ${openedChannel.id}`)
+    console.log(`Order: ${order._id} : Channel Opened: ${orderedChannel.shortChannelId}`)
     alertSlack('info', `channel for order ${order._id} is now open`)
-    order.lightning_channel_id = openedChannel.id
+    order.lightning_channel_id = orderedChannel.shortChannelId
     order.state = Order.ORDER_STATES.OPEN
     await updateOrders([order])
   } else if (orderedChannel.state === 'closed') {
@@ -131,7 +131,7 @@ async function processChannelChanged(order) {
       order.channel_closed_early = true
       alertSlack('notice', `Order: ${order._id} channel closed before expiry.`)
     }
-    console.log(`Order: ${order._id} : Channel Closed: ${closedChannel.close_transaction_id}`)
+    console.log(`Order: ${order._id} : Channel Closed: ${orderedChannel.closingTxId}`)
     await updateOrders([order])
   }
 }
