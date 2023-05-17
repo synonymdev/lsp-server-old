@@ -66,7 +66,8 @@ async function updateOrders(orders) {
     await Order.updateOrder(order._id, {
       state,
       order_result: order.order_result,
-      channel_open_tx: order.channel_open_tx
+      channel_open_tx: order.channel_open_tx,
+      channel_order: result
     })
   }))
 }

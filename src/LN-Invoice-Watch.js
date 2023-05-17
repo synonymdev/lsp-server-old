@@ -126,7 +126,7 @@ async function processHeldInvoice ({ order }, options = {}) {
 
 async function startWatch () {
   console.log('Listening on invoice changes')
-  const listener = new Ln2EventListener('svc:buy_channel')
+  const listener = new Ln2EventListener('svc:blocktank-server')
   try {
     await listener.init()
     await listener.listenToInvoicesChanged(async (message) => {

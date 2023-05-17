@@ -48,6 +48,15 @@
                 "<node_internals>/**"
             ],
             "program": "${workspaceFolder}/src/LN-Channel-Opener.js"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "LN Channel Watch",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/src/LN-Channel-Watch.js"
         }
     ]
 }
