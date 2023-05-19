@@ -1,6 +1,6 @@
-# Blocktank Server
+# blocktank-lsp-http
 
-Blocktank is an LSP that allows businesses, apps, or online platforms to integrate, automate, and monetize services from your Lightning node. This includes channel configuration, channel purchases, channel info and more.
+Blocktank is an LSP that allows businesses, apps, or online platforms to integrate, automate, and monetize services from your Lightning node. This includes channel configuration, channel purchases, channel info and more. This service provides a HTTP API for websites to purchase channels.
 
 
 #### [Live Version](http://synonym.to/blocktank)
