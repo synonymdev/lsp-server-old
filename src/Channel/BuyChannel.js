@@ -11,7 +11,7 @@ const Order = require('../Orders/Order')
 const config = require('../../config/server.json')
 const { constants } = config
 const { public_uri: publicUri } = config
-const { LnWorkerApi } = require('@blocktank/ln2-api');
+const { LnWorkerApi } = require('@synonymdev/blocktank-lsp-ln2-client');
 
 
 class BuyChannel extends Worker {

@@ -8,8 +8,8 @@ const Order = require('./Orders/Order')
 const { ORDER_STATES } = require('./Orders/Order')
 const { Client: GrenacheClient } = require('blocktank-worker')
 
-const { Ln2EventListener, LnWorkerApi } = require('@blocktank/ln2-api');
-const { waitOnSigint } = require('@blocktank/worker2')
+const { LnEventListener, LnWorkerApi } = require('@synonymdev/blocktank-lsp-ln2-client');
+const { waitOnSigint } = require('@synonymdev/blocktank-worker2')
 
 const gClient = new GrenacheClient({})
 
@@ -138,7 +138,7 @@ async function processChannelChanged(order) {
 
 
 async function main () {
-  const listener = new Ln2EventListener('svc:blocktank-server')
+  const listener = new LnEventListener('svc:blocktank-server')
   try {
     await listener.init()
     await listener.listenToOpenChannelChanged(async message => {

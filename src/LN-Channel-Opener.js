@@ -6,7 +6,7 @@ const async = require('async')
 const { Client: GrenacheClient } = require('blocktank-worker')
 const { find } = require('lodash')
 const { parseChannelOpenErr, chanErrors: errors } = require("./util/channel-opening-errors")
-const { LnWorkerApi } = require('@blocktank/ln2-api');
+const { LnWorkerApi } = require('@synonymdev/blocktank-lsp-ln2-client');
 
 console.log('Starting Channel Opener...')
 

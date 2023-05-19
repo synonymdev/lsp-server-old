@@ -1,4 +1,4 @@
-import { LnWorkerApi, Ln2EventListener } from '@blocktank/ln2-api';
+import { LnWorkerApi, LnEventListener } from '@synonymdev/blocktank-lsp-ln2-client';
 
 
 
@@ -17,7 +17,7 @@ describe('LnWorkerService', () => {
 
 
     it('createInvoice', async () => {
-        const listener = new Ln2EventListener('myFirstWorker')
+        const listener = new LnEventListener('myFirstWorker')
         await listener.init()
         listener.listenToInvoicesChanged(async message => {
             console.log('invoices changed', message)
