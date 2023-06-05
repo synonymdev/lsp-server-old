@@ -82,6 +82,15 @@ class GetOrder extends Worker {
     })
   }
 
+  _shouldAcceptZeroConf(order){
+
+    if (order.state !== ORDER_STATES.CREATED || order.zero_conf) return false 
+
+    if(order.zero_conf_satvbyte_expiry && order.zero_conf_satvbyte_expiry > Date.now()) return false
+
+    return true
+  }
+
   async _formatOrders(nodeInfo, data){
     data.product_id = data.product_id._id
     data.purchase_invoice = data.ln_invoice.request
@@ -100,7 +109,9 @@ class GetOrder extends Worker {
       r.ln_invoice = r.ln_invoice.request
       return r
     })
-    if (data.state === ORDER_STATES.CREATED && !data.zero_conf) {
+
+
+    if(this._shouldAcceptZeroConf(data)) {
       data.zero_conf_satvbyte = false
       try {
         const zc = await this._getZeroConfQuote(data.total_amount)
@@ -108,7 +119,7 @@ class GetOrder extends Worker {
           data.zero_conf_satvbyte = zc.minimum_satvbyte
           data.zero_conf_satvbyte_expiry = zc.fee_expiry
           Order.updateOrder(data._id, {
-            zero_conf_satvbyte_expiry: data.zero_conf_satvbyte_expiry,
+            zero_conf_satvbyte_expiry:  data.zero_conf_satvbyte_expiry,
             zero_conf_satvbyte: data.zero_conf_satvbyte
           })
         }
