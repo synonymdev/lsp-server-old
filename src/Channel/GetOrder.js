@@ -135,11 +135,14 @@ class GetOrder extends Worker {
       console.log(err)
     }
 
-    if(+fullData !== 1) {
-      privateProps.forEach((k) => {
-        delete data[k]
-      })
+    if(+fullData === 1) {
+      data.opening_attempts = data.order_result
     }
+
+    privateProps.forEach((k) => {
+      delete data[k]
+    })
+
     return data
   }
 
