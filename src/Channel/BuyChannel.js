@@ -10,12 +10,13 @@ const { getChannelPrice } = require('../util/pricing')
 const Order = require('../Orders/Order')
 const config = require('../../config/server.json')
 const { constants } = config
-const { public_uri: publicUri } = config
+const { public_uri: publicUri, db_url: dbURL } = config
 
 class BuyChannel extends Worker {
   constructor (config) {
     config.name = 'svc:buy_channel'
     config.port = config.port || 7672
+    config.db_url = dbURL
     super(config)
   }
 
@@ -150,6 +151,7 @@ class BuyChannel extends Worker {
       },
       async (res, next) => {
         const invoice = await this._getLnInvoice(order.product_id, totalAmount)
+        order.user_agent = options.user_agent
         order.renewals = []
         order.onchain_payments = []
         order.onchain_payment_swept = false
@@ -193,6 +195,10 @@ class BuyChannel extends Worker {
         console.log(err, data)
         this.alertSlack('warning', 'Failed to create buy order')
         return cb(null, this.errRes())
+      }
+
+      if(options.user_agent === "Bitkit") {
+        this.alertSlack("info", `New order from Bitkit: ${order_id}`)
       }
 
       cb(null, data)
