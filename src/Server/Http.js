@@ -19,7 +19,7 @@ class Server extends EventEmitter {
     this.app.use(helmet())
     this.app.use(bodyParser.json())
     this.port = config.port || 4000
-    this.host = config.host || "loclahost"
+    this.host = config.host || "localhost"
     this.gClient = new GrenacheClient(config)
   }
 
@@ -59,7 +59,8 @@ class Server extends EventEmitter {
     }
 
     this.gClient.send(endpoint.config.svc, [args, {
-      endpoint
+      endpoint,
+      user_agent: req.headers["user-agent"] || "NA"
     }], (err, data) => {
       if (err) {
         console.log(err)
