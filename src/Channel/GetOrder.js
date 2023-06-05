@@ -50,7 +50,7 @@ class GetOrder extends Worker {
 
   getPendingPaymentOrders (args, cb) {
     const query = {
-      order_expiry: { $lte: Date.now() + 10800000 },
+      order_expiry: { $lte: Date.now() + 5000 },
       state: ORDER_STATES.CREATED,
       ...args
     }
@@ -91,7 +91,7 @@ class GetOrder extends Worker {
     return true
   }
 
-  async _formatOrders(nodeInfo, data){
+  async _formatOrders(nodeInfo, data, fullData){
     data.product_id = data.product_id._id
     data.purchase_invoice = data.ln_invoice.request
     if (data.state === ORDER_STATES.GIVE_UP) {
@@ -135,14 +135,17 @@ class GetOrder extends Worker {
       console.log(err)
     }
 
-    privateProps.forEach((k) => {
-      delete data[k]
-    })
+    if(+fullData !== 1) {
+      privateProps.forEach((k) => {
+        delete data[k]
+      })
+    }
     return data
   }
 
   async main (args, options, cb) {
     const orderId = args.order_id
+    const fullData = args.full_data
     if(!orderId) return this.errRes("Order id not passed")
     const nodeInfo = await this.callLn('getInfo', {})
     const orders = orderId.split(",")
@@ -152,7 +155,7 @@ class GetOrder extends Worker {
         console.log(err, data)
         return cb(null, this.errRes('Order not found'))
       }
-      const formatted = await Promise.all(data.map((d)=> this._formatOrders(nodeInfo, d) ))
+      const formatted = await Promise.all(data.map((d)=> this._formatOrders(nodeInfo, d, fullData) ))
       if(orders.length === 1){
         return cb(null, formatted.pop())
       }
