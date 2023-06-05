@@ -11,7 +11,7 @@
   "author": "r32a_",
   "license": "ISC",
   "dependencies": {
-    "@synonymdev/blocktank-lsp-ln2-client": "^0.2.0",
+    "@synonymdev/blocktank-lsp-ln2-client": "^0.2.2",
     "async": "^3.2.0",
     "axios": "^0.21.4",
     "bcrypt": "^5.0.1",
