@@ -12,7 +12,7 @@ module.exports = {
   apps: [
     {
       name: 'ln:channel-opener',
-      script: './LN-Channel-Opener.js',
+      script: './src/LN-Channel-Opener.js',
       env: {
         DEBUG: DEBUG_FLAG
       },
@@ -21,7 +21,7 @@ module.exports = {
     },
     {
       name: 'order:expiry-watch',
-      script: './Order-Expiry-Watch.js',
+      script: './src/Order-Expiry-Watch.js',
       env: {
         DEBUG: DEBUG_FLAG
       },
@@ -30,7 +30,7 @@ module.exports = {
     },
     {
       name: 'ln:invoice-watch',
-      script: './LN-Invoice-Watch.js',
+      script: './src/LN-Invoice-Watch.js',
       env: {
         DEBUG: DEBUG_FLAG
       },
@@ -39,7 +39,7 @@ module.exports = {
     },
     {
       name: 'ln:channel-watch',
-      script: './LN-Channel-Watch.js',
+      script: './src/LN-Channel-Watch.js',
       env: {
         DEBUG: DEBUG_FLAG
       },
@@ -66,7 +66,7 @@ module.exports = {
     },
     {
       name: 'server:express',
-      script: './Start-Express.js',
+      script: './src/Start-Express.js',
       env: {
         DEBUG: DEBUG_FLAG
       },
@@ -130,7 +130,7 @@ module.exports = {
 
     {
       name: 'server:admin',
-      script: './Start-Admin.js',
+      script: './src/Start-Admin.js',
       env: {
         DEBUG: DEBUG_FLAG
       },

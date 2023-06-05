@@ -1,4 +1,3 @@
-const { default: client } = require('@synonymdev/blocktank-client')
 const assert = require('assert')
 const { promisify } = require('util')
 const PromoChannels = require('../../src/Channel/PromoChannels')
@@ -29,10 +28,11 @@ describe("Promo Channels",()=>{
         'capacity_total',
         'capacity_tick'
       ]
-      assert(stats._id)
-      assert(stats.state > 0)
+      expect(stats,_id).toBeTruthy()
+      expect(stats.state).toBeGreaterThan(0)
+
       keys.forEach((k)=>{
-        assert(typeof stats.stats[k] === "number")
+        expect(typeof stats[k]).toBe("number")
       })
     })
     it("checkCapacity should return true when we have capacity", async ()=>{
@@ -47,7 +47,7 @@ describe("Promo Channels",()=>{
         })
       }
       const cap = await promoChan.checkCapcity()
-      assert(cap === true)
+      expect(cap).toBe(true)
     })
     it("checkCapacity should return false when we have capacity", async ()=>{
       promoChan.getStats = (cb)=>{
@@ -61,7 +61,7 @@ describe("Promo Channels",()=>{
         })
       }
       const cap = await promoChan.checkCapcity()
-      assert(cap === false)
+      expect(cap).toEqual(false)
     })
   })
 
@@ -74,7 +74,7 @@ describe("Promo Channels",()=>{
         }])
       }
       const cap = await promisify(promoChan.processOrders.bind(promoChan))()
-      assert(cap.orders_processed === 0)
+      expect(cap.orders_processed).toEqual(0)
     })
     it("Should give up on order when no capacity", async ()=>{
       promoChan.getStats = (cb)=>{
@@ -91,7 +91,7 @@ describe("Promo Channels",()=>{
         cb(null,[])
       }
       const cap = await promisify(promoChan.processOrders.bind(promoChan))()
-      assert(cap.orders_processed === 0)
+      expect(cap.orders_processed).toEqual(0)
     })
   })
 })

@@ -1,0 +1,62 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch Server Express",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/Start-Express.js"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "ZeroConf Watcher",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/src/Channel/ZeroConf.js"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "LN-Invoice Watcher",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/src/LN-Invoice-Watch.js"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "GetOrder Worker",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/src/Channel/GetOrder.js"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "LN Channel Opener",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/src/LN-Channel-Opener.js"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "LN Channel Watch",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/src/LN-Channel-Watch.js"
+        }
+    ]
+}

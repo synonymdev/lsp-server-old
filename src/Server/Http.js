@@ -19,7 +19,7 @@ class Server extends EventEmitter {
     this.app.use(helmet())
     this.app.use(bodyParser.json())
     this.port = config.port || 4000
-    this.host = config.host || "loclahost"
+    this.host = config.host || "localhost"
     this.gClient = new GrenacheClient(config)
   }
 

@@ -1,5 +1,5 @@
 'use strict'
-const Server = require('./src/Server/Http')
+const Server = require('./Server/Http')
 
 const s = new Server({
   port: 4001,

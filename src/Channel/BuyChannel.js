@@ -11,6 +11,8 @@ const Order = require('../Orders/Order')
 const config = require('../../config/server.json')
 const { constants } = config
 const { public_uri: publicUri } = config
+const { LnWorkerApi } = require('@synonymdev/blocktank-lsp-ln2-client');
+
 
 class BuyChannel extends Worker {
   constructor (config) {
@@ -39,20 +41,29 @@ class BuyChannel extends Worker {
     return { accept: true }
   }
 
+  // _getLnInvoice (id, amount) {
+  //   return new Promise((resolve, reject) => {
+  //     this.callLn('createHodlInvoice', {
+  //       memo: `BlockTank ${id}`,
+  //       amount,
+  //       expiry: constants.order_expiry
+  //     }, (err, invoice) => {
+  //       if (err) {
+  //         console.log(err)
+  //         return reject(new Error('Failed to create invoice'))
+  //       }
+  //       resolve(invoice)
+  //     })
+  //   })
+  // }
+
   _getLnInvoice (id, amount) {
-    return new Promise((resolve, reject) => {
-      this.callLn('createHodlInvoice', {
-        memo: `BlockTank ${id}`,
-        amount,
-        expiry: constants.order_expiry
-      }, (err, invoice) => {
-        if (err) {
-          console.log(err)
-          return reject(new Error('Failed to create invoice'))
-        }
-        resolve(invoice)
-      })
-    })
+    try {
+      return LnWorkerApi.createHodlInvoice(amount, `BlockTank ${id}`, constants.order_expiry)
+    } catch (e) {
+      console.error(e)
+      throw new Error('Failed to create invoice', {cause: e})
+    }
   }
 
   _calExpiry (expiry) {
@@ -99,6 +110,7 @@ class BuyChannel extends Worker {
     const db = this.db
     let product
     try {
+
       product = await db.Inventory.findOne({
         _id: new db.ObjectId(order.product_id)
       })
@@ -106,7 +118,6 @@ class BuyChannel extends Worker {
       console.log(err)
       return cb(null, this.errRes('Failed to find product'))
     }
-
     if (!product) {
       return cb(null, this.errRes('Not in stock'))
     }
@@ -172,6 +183,7 @@ class BuyChannel extends Worker {
         })
       },
       (order, next) => {
+        console.log('Save order', order)
         Order.newLnChannelOrder(order, (err, data) => {
           if (err || !data.insertedId) {
             console.log('Failed to create ID')
