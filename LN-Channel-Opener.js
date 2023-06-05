@@ -31,16 +31,22 @@ async function getProducts (productIds) {
 }
 
 async function updateOrders (orders) {
-  return Promise.all(orders.map(async ({ order, result }) => {
+  
+  const logInfo = []
+  
+  const update = await Promise.all(orders.map(async ({ order, result }) => {
     result.ts = Date.now()
     let state
-
     if (order.order_result.length === MAX_CHANNEL_OPEN_ATTEMPT || result.giveup) {
       // GIVE UP OPENING CHANNEL
       // Tried too many times or node has issues
       state = Order.ORDER_STATES.GIVE_UP
       order.order_result.push(result)
-      alert('notice', `Gave up opening channel: ${order._id} \n ${JSON.stringify(result.error, null, 2)}`)
+      log.push([
+        order._id,
+        "gave up",
+        result
+      ])
     } else if (result.channel_tx && result.channel_tx.transaction_id) {
       // CHANNEL IS OPENING
       state = Order.ORDER_STATES.OPENING
@@ -52,6 +58,11 @@ async function updateOrders (orders) {
       } else {
         order.order_result[order.order_result.length - 1] = result
       }
+      log.push([
+        order._id,
+        "retry",
+        result
+      ])
       state = order.state
     }
 
@@ -65,6 +76,9 @@ async function updateOrders (orders) {
       channel_open_tx: order.channel_open_tx
     })
   }))
+
+  alert("info",`Channel opening attempt result:\n${JSON.stringify(logInfo,null,1)}`)
+  return update 
 }
 
 function parseChannelOptions (product, order) {
