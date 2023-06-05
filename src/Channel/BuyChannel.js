@@ -198,7 +198,7 @@ class BuyChannel extends Worker {
       }
 
       if(options.user_agent === "Bitkit") {
-        this.alertSlack("info", `New order from Bitkit: ${order_id}`)
+        this.alertSlack("info", `New order from Bitkit: ${data.order_id}`)
       }
 
       cb(null, data)

@@ -22,7 +22,7 @@ async function getPaidOrders () {
   return db.LnChannelOrders.find({
     state: Order.ORDER_STATES.URI_SET,
     created_at: { $gte: Date.now() - 172800000 }
-  }).limit(100).toArray()
+  }).limit(10000000).toArray()
 }
 
 async function getProducts (productIds) {
@@ -61,7 +61,7 @@ async function updateOrders (orders) {
       log.push([
         order._id,
         "retry",
-        result
+        result.
       ])
       state = order.state
     }
@@ -77,7 +77,7 @@ async function updateOrders (orders) {
     })
   }))
 
-  alert("info",`Channel opening attempt result:\n${JSON.stringify(logInfo,null,1)}`)
+  //alert("info",`Channel opening attempt result:\n${JSON.stringify(logInfo)}`)
   return update 
 }
 
