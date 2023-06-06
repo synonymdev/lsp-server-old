@@ -27,6 +27,10 @@ const err = [
   ["NO_TX_ID",{
     giveup: true,
     alert: true
+  }],
+  ["FEE_TOO_HIGH", {
+    giveup: false,
+    alert: false
   }]
 ]
 

@@ -18,7 +18,7 @@ async function getFRR () {
 
 const DUST_LIMIT = BN(546)
 const MIN_PRICE = DUST_LIMIT.times(2)
-const TX_FEE = 8000
+const TX_FEE = config.constants.buy_chan_tx_fee
 async function getChannelFee ({ channel_expiry: expiry, local_balance: localBalance }) {
 
   if (config.constants.free_channels) return 0
@@ -55,7 +55,8 @@ async function getChannelFee ({ channel_expiry: expiry, local_balance: localBala
 async function getChannelPrice (args) {
   const price = await getChannelFee(args)
   if (!price) throw new Error('Failed to get price')
-  const totalAmount = BN(args.remote_balance).plus(price).price(TX_FEE)
+  console.log(TX_FEE)
+  const totalAmount = BN(args.remote_balance).plus(price).plus(TX_FEE)
   if (totalAmount.isNaN() || totalAmount.lte(0)) throw new Error('Created invalid price')
   return {
     price,

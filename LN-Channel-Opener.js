@@ -4,13 +4,14 @@ const Order = require('./src/Orders/Order')
 const config = require('./config/server.json')
 const async = require('async')
 const { Client: GrenacheClient } = require('blocktank-worker')
-const { lnWorker } = require('./src/util/common-workers')
+const { lnWorker, callWorker } = require('./src/util/common-workers')
 const { find } = require('lodash')
 const {parseChannelOpenErr, chanErrors: errors} = require("./src/util/channel-opening-errors")
 
 console.log('Starting Channel Opener...')
 
 const MAX_CHANNEL_OPEN_ATTEMPT = config.constants.max_attempt_channel_open
+const MAX_CHAN_FEE = 200
 
 Db((err) => {
   if (err) throw err
@@ -28,15 +29,6 @@ async function getPaidOrders () {
 async function getProducts (productIds) {
   const db = await Db()
   return db.Inventory.find({ _id: { $in: productIds } }).toArray()
-}
-
-async function getOpeningFee(cb) {
-  return new Promise((accept, reject) =>{
-    this.gClient('svc:btc:mempool', 'getCurrrentFeeThreshold', {}, (err,data)=>{
-      if(err) return reject(err)
-      accept(data.min_fee)
-    })
-  })
 }
 
 async function updateOrders (orders) {
@@ -177,6 +169,7 @@ function channelOpener () {
         res.result = { error : chanErrors.NO_TX_ID([err,data]) }
         return cb(null, res)
       }
+      data.fee_rate = chanOpenConfig.fee_rate
       res.result = { channel_tx: data }
       cb(null, res)
     })
@@ -184,6 +177,17 @@ function channelOpener () {
 
   return openChannel
 }
+
+
+async function getOpeningFee(cb) {
+  return new Promise((accept, reject) =>{
+    callWorker('svc:btc:mempool', 'getCurrrentFeeThreshold', [{}], (err,data)=>{
+      if(err) return reject(err)
+      accept(data.min_fee)
+    })
+  })
+}
+
 
 function alert (level, msg) {
   gClient.send('svc:monitor:slack', [level, 'ln_channel', msg], () => {})
