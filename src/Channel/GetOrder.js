@@ -15,7 +15,8 @@ const privateProps = [
   'product_info',
   'onchain_payment_swept',
   'channel_closed_early',
-  'renewals'
+  'renewals',
+  'user_agent'
 ]
 
 class GetOrder extends Worker {
