@@ -5,13 +5,14 @@ const async = require('async')
 const _ = require('lodash')
 const Order = require('../Orders/Order')
 const { ORDER_STATES } = require('../Orders/Order')
-const { zero_conf: zcConfig } = require('../../config/server.json')
+const { zero_conf: zcConfig, db_url: dbURL, constants } = require('../../config/server.json')
 
 async function main () {
   class ZeroConf extends Worker {
     constructor (config) {
       config.name = 'svc:btc_zero_conf_orders'
       config.port = 8768
+      config.db_url = dbURL
       super(config)
     }
 
@@ -98,6 +99,7 @@ async function main () {
 
   async function isBlacklistedPayment (payments) {
     console.log('Checking blacklisted payments: ', payments.length)
+    if(!constants.compliance_check) return { blacklisted : false }
     const addr = payments.map((tx) => tx.from)
     const res = await zcWorker.callWorker('svc:channel_aml', 'isAddressBlacklisted', {
       address: addr
@@ -108,7 +110,9 @@ async function main () {
   async function pendingOrders () {
     const orders = await getOrders(ORDER_STATES.CREATED)
     console.log(`Pending orders: ${orders.length}`)
-    const address = orders.map((tx) => tx.btc_address).filter(Boolean)
+    const address = orders
+      .map((tx) => [tx.btc_address, tx.zero_conf_satvbyte] )
+      .filter(Boolean)
     const mempoolTx = await zcWorker._getMempoolTx({ address })
     return async.map(orders, async (order) => {
       let totalAmount = null
@@ -127,6 +131,7 @@ async function main () {
         await Order.updateOrder(order._id, order)
         return null
       }
+
       // Add payments to list
       const alreadyExists = payments.filter((p) => {
         return _.find(order.onchain_payments, { hash: p.hash })

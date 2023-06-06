@@ -30,6 +30,15 @@ async function getProducts (productIds) {
   return db.Inventory.find({ _id: { $in: productIds } }).toArray()
 }
 
+async function getOpeningFee(cb) {
+  return new Promise((accept, reject) =>{
+    this.gClient('svc:btc:mempool', 'getCurrrentFeeThreshold', {}, (err,data)=>{
+      if(err) return reject(err)
+      accept(data.min_fee)
+    })
+  })
+}
+
 async function updateOrders (orders) {
   
   const logInfo = []
@@ -61,7 +70,7 @@ async function updateOrders (orders) {
       log.push([
         order._id,
         "retry",
-        result.
+        result
       ])
       state = order.state
     }
@@ -119,7 +128,7 @@ function channelOpener () {
   }, 60000)
   const max = 10
 
-  function openChannel ({ order, product }, cb) {
+  async function openChannel ({ order, product }, cb) {
     if (count >= max) {
       alert('info', 'Channel opening is being throttled.')
       return cb(new Error('Throttled channel opening'))
@@ -141,6 +150,17 @@ function channelOpener () {
       remote_pub_key: order.remote_node.public_key,
       is_private: order.private_channel
     }
+
+    try {
+      chanOpenConfig.fee_rate = await getOpeningFee()
+    } catch(err){
+      console.log("Failed to get chan opening fee")
+      return cb(err)
+    }
+    
+    if(chanOpenConfig.fee_rate >= MAX_CHAN_FEE) return cb(chanErrors.FEE_TOO_HIGH(["FEE IS HIGHER THAN "+MAX_CHAN_FEE]))
+
+
     console.log(`Opening LN Channel to: ${JSON.stringify(chanOpenConfig,null,2)}`)
 
     lnWorker('openChannel', chanOpenConfig, (err, data) => {
